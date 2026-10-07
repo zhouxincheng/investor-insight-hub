@@ -4,3 +4,4 @@ Inbox/*.txt
 !Inbox/README.md
 __pycache__/
 *.py[cod]
+collect_out/
