@@ -58,12 +58,12 @@ def main():
             "--import-inbox", "--write"]).returncode != 0:
         return 4
 
-    # 4) 可选发布
+    # 4) 可选发布（github 需走本机 Clash 代理，直连会超时）
     if a.publish:
         d = time.strftime("%Y-%m-%d")
-        run(["git", "add", "Reports", "reports.json", "data", "tools", "collect_out"])
+        run(["git", "add", "Reports", "reports.json", "data", "tools"])
         run(["git", "commit", "-m", "chore: 自动采集并生成 %s 日报" % d])
-        run(["git", "push"])
+        run(["git", "-c", "http.proxy=http://127.0.0.1:7890", "push"])
     print("完成：", html)
     return 0
 
