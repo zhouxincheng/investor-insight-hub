@@ -1,0 +1,13 @@
+[
+  {"name": "刘备教授",   "domain": "fugay.com",      "enabled": true},
+  {"name": "猫笔刀",     "domain": "ucaihong.com",   "enabled": true},
+  {"name": "搬砖小组",   "domain": "nnzhijia.com",   "enabled": true},
+  {"name": "韭菜投资学", "domain": "ooxxs.com",      "enabled": true},
+  {"name": "复利人生",   "domain": "g5v.net",        "enabled": true},
+  {"name": "喵点睛",     "domain": "gv8.net",        "enabled": true},
+  {"name": "猫的时光",   "domain": "gayzhijia.com",  "enabled": true},
+  {"name": "贩财局",     "domain": "t5v.net",        "enabled": true},
+  {"name": "徐小明",     "domain": "gayying.com",    "enabled": true},
+  {"name": "越女事务所", "domain": "gaypian.com",    "enabled": true},
+  {"name": "王福重",     "domain": "wfz.xhs.wiki",   "enabled": true}
+]

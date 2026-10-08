@@ -18,7 +18,10 @@ import urllib.request
 
 DEFAULT_CFG = os.path.join(os.path.expanduser("~"), "xqauto", "gen_config.json")
 
-SYSTEM_PROMPT = """你是投资观点日报的编辑。给你一段雪球大V在近24小时内的发帖（每条含 [名字 时间 type] 正文 链接），
+SYSTEM_PROMPT = """你是投资观点日报的编辑。给你大V在近24小时内的观点材料，分两类：
+1. 雪球发帖（短帖）：每条 [名字 时间 type] 一行，下一行正文，再下一行链接；
+2. 公众号文章（长文）：每条【公众号·名字 日期】一行，下一行「标题：…」，再下是全文字（可能多段），再下「来源：链接」。
+公众号文章按「文章级」完整提炼观点（长文信息更全），雪球按短帖处理。
 输出**严格 JSON**（不要 markdown 代码块、不要任何解释），字段如下：
 
 {
@@ -104,12 +107,12 @@ TEMPLATE = """<!doctype html>
 <meta name="report:industries" content="{industries}">
 <meta name="report:stocks" content="{stocks}">
 <meta name="report:influencers" content="{influencers}">
-<meta name="report:sources" content="雪球">
+<meta name="report:sources" content="雪球,公众号">
 <style>
 :root{{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#667085;--blue:#2457c5;--green:#13795b;--red:#b42318;--amber:#9a6700}}
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}}
 .wrap{{max-width:1180px;margin:0 auto;padding:28px 18px 60px}}.hero{{background:linear-gradient(135deg,#183b82,#3478d4);color:#fff;border-radius:18px;padding:30px 32px}}
-h1{{margin:0 0 8px;font-size:30px}}.subtitle{{opacity:.88}}.grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}}
+h1{{margin:0 0 8px;font-size:30px}}.subtitle{{opacity:.88}}.grid{{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}}
 .stat{{background:#ffffff1a;border:1px solid #ffffff2b;border-radius:12px;padding:12px 14px}}.stat b{{display:block;font-size:24px}}.stat span{{font-size:12px;opacity:.85}}
 section{{background:var(--card);border:1px solid #e6eaf0;border-radius:14px;margin-top:18px;padding:22px 24px}}h2{{margin:0 0 14px;font-size:21px;border-left:4px solid var(--blue);padding-left:10px}}
 .callout{{background:#f0f5ff;border-left:4px solid var(--blue);padding:13px 16px;border-radius:8px;margin:10px 0 4px}}
@@ -125,6 +128,7 @@ table{{width:100%;border-collapse:collapse;margin-top:10px}}th,td{{border-bottom
 <div class="subtitle">统计区间：严格近24小时</div>
 <div class="grid" aria-label="采集统计">
 <div class="stat"><b>{main_count}</b><span>雪球主贴</span></div>
+<div class="stat"><b>{gzh_count}</b><span>公众号文章</span></div>
 <div class="stat"><b>{active_count}</b><span>活跃大V</span></div>
 <div class="stat"><b>{buy_count}</b><span>明确买卖/仓位调整</span></div>
 <div class="stat"><b>{stock_count}</b><span>涉及标的</span></div>
@@ -134,7 +138,7 @@ table{{width:100%;border-collapse:collapse;margin-top:10px}}th,td{{border-bottom
 <section><h2>市场与行业判断</h2>{table_html}</section>
 <section><h2>仅讨论，不作为交易信号</h2>{disc_html}</section>
 <div class="legend">{legend_html}</div>
-<div class="footer">数据源：{src_name} · 本文为信息整理，不构成投资建议</div>
+<div class="footer">数据源：雪球 + 公众号 · 本文为信息整理，不构成投资建议</div>
 </div></body></html>"""
 
 
@@ -158,7 +162,9 @@ def main():
         return 2
 
     # 统计：按「帖子块」计数（每块以 [名字 开头），不能用 URL 出现次数——正文里也可能含链接
-    main_count = sum(1 for l in txt.splitlines() if l.lstrip().startswith("["))
+    main_count = sum(1 for l in txt.splitlines()
+                     if l.lstrip().startswith("[") and not l.lstrip().startswith("【"))
+    gzh_count = sum(1 for l in txt.splitlines() if l.lstrip().startswith("【公众号·"))
     infs = d.get("influencers") or []
     tags = "，".join(d.get("tags") or [])
     inds = "，".join(d.get("industries") or [])
@@ -207,7 +213,7 @@ def main():
     html = TEMPLATE.format(
         title=esc(d.get("title")), date=esc(d.get("date")), summary=esc(d.get("summary")),
         tags=esc(tags), industries=esc(inds), stocks=esc(stocks), influencers=esc(inf_str),
-        main_count=main_count, active_count=len(infs), buy_count=buy_count,
+        main_count=main_count, gzh_count=gzh_count, active_count=len(infs), buy_count=buy_count,
         stock_count=len(d.get("stocks") or []),
         core_html=callout_html(), signals_html=signals_html(), table_html=table_html(),
         disc_html=disc_html(), legend_html=legend_html, src_name=esc(src_name))
