@@ -146,8 +146,9 @@ def main():
     a = ap.parse_args()
     cfg = json.load(open(a.config, encoding="utf-8"))
     txt = open(a.txt, encoding="utf-8").read()
-    if len(txt) > 50000:
-        txt = txt[:50000]  # 控 token
+    if len(txt) > 200000:                      # 硬上限兜底；deepseek-chat 上下文足够
+        print("[warn] txt %d 字符超过 200000，截断（会丢尾部帖子）" % len(txt))
+        txt = txt[:200000]
     src_name = os.path.basename(a.txt)
 
     content = call_deepseek(cfg, txt)
