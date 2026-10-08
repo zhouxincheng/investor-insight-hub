@@ -31,6 +31,13 @@ def main():
     ap.add_argument("--publish", action="store_true", help="工作区干净时 git commit + push")
     a = ap.parse_args()
 
+    # 同日幂等：当天日报已归档过就跳过（重复触发不失败、不烧额度）
+    _date = time.strftime("%Y%m%d")
+    _existing = os.path.join(ROOT, "Reports", time.strftime("%Y"), "report_%s.html" % _date)
+    if os.path.exists(_existing):
+        print("今日日报已归档（%s），跳过重复运行。" % _existing)
+        return 0
+
     outdir = os.path.abspath(a.out_dir)
     os.makedirs(outdir, exist_ok=True)
 
