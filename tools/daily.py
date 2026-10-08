@@ -51,23 +51,6 @@ def main():
         return 2
     txt = txts[-1]
 
-    # 1.5) 公众号采集（失败不阻断，降级为仅雪球）
-    if run([PY, os.path.join(HERE, "collect_gongzhonghao.py"), "--hours", str(a.hours),
-            "--out-dir", outdir, "--max-per-account", "3"]).returncode != 0:
-        print("[warn] 公众号采集失败，降级为仅雪球")
-    gzh_txts = sorted(glob.glob(os.path.join(outdir, "*_公众号文章_*.txt")), key=os.path.getmtime)
-    gzh_txt = gzh_txts[-1] if gzh_txts else None
-
-    # 1.6) 合并雪球 + 公众号 → 一份素材
-    merged = os.path.join(outdir, "%s_合并素材.txt" % time.strftime("%Y%m%d_%H%M%S"))
-    with open(merged, "w", encoding="utf-8") as f:
-        f.write(open(txt, encoding="utf-8").read())
-        if gzh_txt and os.path.exists(gzh_txt):
-            f.write("\n\n" + open(gzh_txt, encoding="utf-8").read())
-        else:
-            f.write("\n\n# 公众号今日无数据（源站点无更新或采集失败）\n")
-    txt = merged
-
     # 2) 生成
     date = time.strftime("%Y%m%d")
     html = os.path.join(outdir, "report_%s.html" % date)
