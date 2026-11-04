@@ -3,9 +3,29 @@
   "site": {
     "name": "Investor Insight Hub 投资观点库",
     "description": "雪球与微博大 V 投资观点日报归档",
-    "updatedAt": "2026-11-03"
+    "updatedAt": "2026-11-04"
   },
   "reports": [
+    {
+      "id": "20261104-4c832f20ac",
+      "date": "2026-11-04",
+      "year": 2026,
+      "title": "大V每日观点：2026年11月04日",
+      "summary": "近24小时内未采集到任何大V主贴，无新增观点、交易动作或风险提示，本期无实质内容。",
+      "file": "Reports/2026/report_20261104.html",
+      "industries": [],
+      "tags": [
+        "无更新"
+      ],
+      "stocks": [],
+      "influencers": [],
+      "sources": [
+        "雪球"
+      ],
+      "featured": false,
+      "metrics": {},
+      "type": "daily"
+    },
     {
       "id": "20261103-9d9b6bf0c6",
       "date": "2026-11-03",
